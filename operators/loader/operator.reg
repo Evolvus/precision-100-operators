@@ -1,0 +1,2 @@
+loader,"$PRECISION100_OPERATORS_FOLDER/loader/bin/loader-template.sh"
+sql-loader,"$PRECISION100_OPERATORS_FOLDER/loader/bin/loader-template.sh"
