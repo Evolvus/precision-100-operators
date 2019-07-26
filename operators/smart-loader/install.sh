@@ -1,7 +1,7 @@
 OPERATOR_NAME=smart-loader
 echo "Installing $OPERATOR_NAME operator"
 
-source $PRECISION100_OPERATORS_FOLDER/smart-loader/conf/.operators.env.sh
+source $PRECISION100_OPERATORS_FOLDER/smart-loader/conf/.operator.env.sh
 
 mkdir -p "$SQLLDR_INPUT"
 mkdir -p "$SQLLDR_LOG"
