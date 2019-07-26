@@ -7,15 +7,15 @@ FILE_TYPE=$(echo $2 | cut -d ',' -f 3)
 CONNECTION_NAME=$(echo $2 | cut -d ',' -f 4)
 
 
-if test "$SIMULATION_MODE" = "TRUE"; then
+if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
    echo "        START MAP-FILE ADAPTOR $FILE_NAME"
-   sleep $SIMULATION_SLEEP;
+   sleep $PRECISION100_RUNTIME_SIMULATION_SLEEP;
    echo "        END MAP-FILE ADAPTOR $FILE_NAME"
    exit;
 fi
 
 echo "        START MAP-FILE ADAPTOR $FILE_NAME"
-source $PRECISION100_OPERATORS_FOLDER/map-file/conf/.map-file.env.sh
+source $PRECISION100_OPERATORS_FOLDER/map-file/conf/.operator.env.sh
 mkdir -p $MAP_FILE_WORK_FOLDER;
 
 SOURCE_FILE="$PRECISION100_EXECUTION_CONTAINER_FOLDER/$CONTAINER/$FILE_NAME.$MAP_FILE_FILE_SUFFIX"

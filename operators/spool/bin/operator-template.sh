@@ -7,16 +7,16 @@ QUOTE=$(echo $2 | cut -d ',' -f 5)
 SPOOL_FILE_NAME=$(echo $2 | cut -d ',' -f 6)
 CONNECTION_NAME=$(echo $2 | cut -d ',' -f 7)
 
-if test "$SIMULATION_MODE" = "TRUE"; then
+if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
    echo "        START SPOOL ADAPTOR $FILE_NAME"
-   sleep $SIMULATION_SLEEP;
+   sleep $PRECISION100_RUNTIME_SIMULATION_SLEEP;
    echo "        END SPOOL ADAPTOR $FILE_NAME"
    exit;
 fi
 
 echo "        START SPOOL ADAPTOR $FILE_NAME"
 
-source $PRECISION100_OPERATORS_FOLDER/spool/conf/.spool.env.sh
+source $PRECISION100_OPERATORS_FOLDER/spool/conf/.operator.env.sh
 
 if [ -z "$DELIMITER" ]; then
     DELIMITER=${DEFAULT_DELIMITER:-,}

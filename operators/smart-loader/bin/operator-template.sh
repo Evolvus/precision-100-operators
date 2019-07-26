@@ -7,16 +7,16 @@ CONNECTION_NAME=$(echo $2 | cut -d ',' -f 5)
 
 LOADER_FILE_NAME=${FILE_NAME}
 
-if test "$SIMULATION_MODE" = "TRUE"; then
+if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
    echo "        START SMART_LOADER ADAPTOR $FILE_NAME"
-   sleep $SIMULATION_SLEEP;
+   sleep $PRECISION100_RUNTIME_SIMULATION_SLEEP;
    echo "        END SMART_LOADER ADAPTOR $FILE_NAME"
    exit;
 fi
 
 echo "        START SMART_LOADER ADAPTOR $FILE_NAME"
 
-source $PRECISION100_OPERATORS_FOLDER/smart-loader/conf/.smart-loader.env.sh
+source $PRECISION100_OPERATORS_FOLDER/smart-loader/conf/.operator.env.sh
 
 mkdir -p "$SQLLDR_LOG"
 mkdir -p "$SQLLDR_BAD"
