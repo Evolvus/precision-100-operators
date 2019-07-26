@@ -9,13 +9,13 @@ CONNECTION_NAME=$(echo $2 | cut -d ',' -f 5)
 
 echo "        START LENGTH-VALIDATOR ADAPTOR $FILE_NAME"
 
-if test "$SIMULATION_MODE" = "TRUE"; then
+if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
    sleep $SIMULATION_SLEEP;
    echo "        END LENGTH-VALIDATOR ADAPTOR $FILE_NAME"
    exit;
 fi
 
-source $PRECISION100_OPERATORS_FOLDER/length-validator/conf/.length-validator.env.sh
+source $PRECISION100_OPERATORS_FOLDER/length-validator/conf/.operator.env.sh
 mkdir -p $LENGTH_VALIDATOR_WORK_FOLDER;
 
 if [[ -z "$VIEW_NAME" ]]; then

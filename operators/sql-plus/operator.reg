@@ -1,2 +1,2 @@
-sql,"$PRECISION100_OPERATORS_FOLDER/sql-plus/bin/sql-plus-template.sh"
-sql-plus,"$PRECISION100_OPERATORS_FOLDER/sql-plus/bin/sql-plus-template.sh"
+sql,"$PRECISION100_OPERATORS_FOLDER/sql-plus/bin/operator-template.sh"
+sql-plus,"$PRECISION100_OPERATORS_FOLDER/sql-plus/bin/operator-template.sh"
