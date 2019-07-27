@@ -1,1 +1,1 @@
-#!/bin/bash
+echo "Executing map-fie on-exec"

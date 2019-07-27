@@ -1,3 +1,5 @@
+#!/bin/bash
+
 TABLE_NAME=$1
 DELIMITER=$2
 QUOTE=$3

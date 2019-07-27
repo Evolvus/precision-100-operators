@@ -1,3 +1,1 @@
-#!/bin/bash
-echo "Executinig sql-plus $0"
-
+echo "Executing sql-plus on-exec"

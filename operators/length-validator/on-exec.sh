@@ -1,2 +1,1 @@
-#!/bin/bash
-echo "Executing length-validator $0"
+echo "Executing length-validator on-exec"

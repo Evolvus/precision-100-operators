@@ -1,3 +1,4 @@
+#!/bin/bash
 OPERATOR_NAME=map-file
 echo "Installing $OPERATOR_NAME operator"
 
