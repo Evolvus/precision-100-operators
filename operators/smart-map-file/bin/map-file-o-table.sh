@@ -35,15 +35,15 @@ function define_table() {
     fi
     if [[ counter -eq 1 ]]; then
       counter=$counter+1;
-      get_column_definition $column_name $max_length
+      get_column_definition "$column_name" $max_length
       continue;
     fi
     counter=$counter+1;
     echo ", " 
-    get_column_definition $column_name $max_length
+    get_column_definition "$column_name" $max_length
   done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
   echo ");"
 }
 
 define_table ${TABLE_NAME_PREFIX} ${TABLE_NAME}
-define table ${REVERSE_TABLE_NAME_PREFIX} ${TABLE_NAME}
+define_table ${REVERSE_TABLE_NAME_PREFIX} ${TABLE_NAME}
