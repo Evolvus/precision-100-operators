@@ -15,7 +15,7 @@ JOIN_FILE=$3
 echo "EXEC TRANSFORM_INTERCEPTOR('PRE','${TABLE_NAME}'); "
 echo "INSERT INTO ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name old_column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification;
 do
   if [[ -z "$column_name" ]]; then
     continue;
@@ -26,16 +26,16 @@ do
   fi
   if [[ counter -eq 1 ]]; then
     counter=$counter+1;
-    echo "  $column_name"
+    echo "  ${column_name:0:30}"
     continue;
   fi
   counter=$counter+1;
-  echo ", $column_name"
+  echo ", ${column_name:0:30}"
 done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
 echo ") SELECT "
 
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name old_column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification;
 do
   if [[ -z "$column_name" ]]; then
     continue;
@@ -66,7 +66,7 @@ do
   counter=$counter+1;
 done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
 
-while IFS=$MAP_FILE_DELIMITER read -r mapping_value;
+while IFS='~' read -r mapping_value;
 do
   if [[ -z "$mapping_value" ]]; then
     continue;

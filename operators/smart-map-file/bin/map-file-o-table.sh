@@ -13,7 +13,7 @@ TABLE_NAME=$1
 SOURCE_FILE=$2
 
 function get_column_definition() {
-  v_column_name=$1
+  v_column_name=$(echo ${1:0:30} | tr '[:lower:]' '[:upper:]')
   v_data_type="NVARCHAR2"
   v_column_length=${2:-2000}
 
@@ -21,10 +21,11 @@ function get_column_definition() {
 }
 
 function define_table() {
-  echo "DROP TABLE ${1}_${2};"
-  echo "CREATE TABLE ${1}_${2} ("
+  upper_case_table_name=$(echo "${1}_${2}" | tr '[:lower:]' '[:upper:]')
+  echo "DROP TABLE ${upper_case_table_name};"
+  echo "CREATE TABLE ${upper_case_table_name} ("
   counter=0
-  while IFS=$MAP_FILE_DELIMITER read -r column_name old_column_name data_type max_length mapping_code mapping_value justification;
+  while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification;
   do
     if [[ -z "$column_name" ]]; then
       continue;
