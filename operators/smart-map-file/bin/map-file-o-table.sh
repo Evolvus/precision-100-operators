@@ -24,7 +24,7 @@ function define_table() {
   echo "DROP TABLE ${1}_${2};"
   echo "CREATE TABLE ${1}_${2} ("
   counter=0
-  while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+  while IFS=$MAP_FILE_DELIMITER read -r column_name old_column_name data_type max_length mapping_code mapping_value;
   do
     if [[ -z "$column_name" ]]; then
       continue;

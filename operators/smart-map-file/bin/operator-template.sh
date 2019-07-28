@@ -27,11 +27,11 @@ MAP_FILE_DELIMITER=${DEFAULT_MAP_FILE_DELIMITER:-~}
 
 
 cat $SOURCE_FILE | cut -d $'\t' -f 1 | tr '[:lower:]' '[:upper:]' | tr -s ')' ' ' | tr -s '(' ' ' | tr -s '[:punct:]' ' ' | sed 's/[[:blank:]]*$//' > $TEMP_FILE_1
-awk -f $PRECISION100_OPERATORS_FOLDER/smart-map-file/bin/dict.awk $PRECISION100_OPERATORS_FOLDER/smart-map-file/bin/dictionary.dat $TEMP_FILE_2
+awk -f $PRECISION100_OPERATORS_FOLDER/smart-map-file/bin/dict.awk $PRECISION100_OPERATORS_FOLDER/smart-map-file/bin/dictionary.dat $TEMP_FILE_1 | tr ' ' '_' > $TEMP_FILE_2
 paste $TEMP_FILE_2 $SOURCE_FILE > $TEMP_FILE_3
 
 grep -i -v ${MAP_FILE_JOIN_FILTER} $TEMP_FILE_3 > "$DDL_SOURCE_FILE"
-grep ${MAP_FILE_JOIN_FILTER} $TEMP_FILE_2 |  tr -d "$MAP_FILE_DELIMTER" |  sed -n "s/${MAP_FILE_JOIN_FILTER}//p" > "$JOIN_SOURCE_FILE"
+grep ${MAP_FILE_JOIN_FILTER} $TEMP_FILE_3 |  tr -d "$MAP_FILE_DELIMTER" |  sed -n "s/${MAP_FILE_JOIN_FILTER}//p" > "$JOIN_SOURCE_FILE"
 
 O_TABLE_SQL=$PRECISION100_OPERATOR_SMART_MAP_FILE_WORK_FOLDER/"${DEFAULT_TABLE_NAME_PREFIX}-${FILE_NAME}.sql"
 O_TAB_COLUMN_SQL=$PRECISION100_OPERATOR_SMART_MAP_FILE_WORK_FOLDER/"${DEFAULT_TABLE_NAME_PREFIX}-${FILE_NAME}-${DEFAULT_TAB_COLUMN_SUFFIX}.sql"
