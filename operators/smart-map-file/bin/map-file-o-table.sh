@@ -25,7 +25,7 @@ function define_table() {
   echo "DROP TABLE ${upper_case_table_name};"
   echo "CREATE TABLE ${upper_case_table_name} ("
   counter=0
-  while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification mandatory;
+  while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification mandatory info1 info2 info3;
   do
     if [[ -z "$column_name" ]]; then
       continue;
