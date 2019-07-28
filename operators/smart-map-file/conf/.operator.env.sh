@@ -23,5 +23,4 @@ DEFAULT_MAPPING_VALUE_INDEX="6"
 # for others like ',' or '~' etc, we can directly assign the value as below
 # export DEFAULT_MAP_FILE_DELIMITER=',' 
 #
-#DEFAULT_MAP_FILE_DELIMITER='~'
-DEFAULT_MAP_FILE_DELIMITER=$'\t'
+DEFAULT_MAP_FILE_DELIMITER='~'
