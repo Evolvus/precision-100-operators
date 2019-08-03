@@ -24,4 +24,4 @@ source $PRECISION100_FOLDER/conf/.env.sh
 
 source $PRECISION100_CONNECT_OPERATORS_FOLDER/secure-oracle/conf/.operator.env.sh
 
-echo $2 | openssl enc -e -aes-256-cbc -out ./conf/"$1".enc -base64 -K $key -iv $iv
+echo $2 | openssl enc -e -aes-256-cbc -out $PRECISON100_PROJECT_CONF_FOLDER/"$1".enc -base64 -K $key -iv $iv
