@@ -1,1 +1,1 @@
-ORACLE,"$PRECISION100_CONNECTORS_FOLDER/oracle/bin/operator-template.sh"
+ORACLE,"$PRECISION100_CONNECT_OPERATORS_FOLDER/oracle/bin/operator-template.sh"
