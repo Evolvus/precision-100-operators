@@ -16,7 +16,7 @@ if [ ! -f ./conf/.project.env.sh ]; then
 fi
 source ./conf/.project.env.sh
 
-if [ -z "$PRECISION100_FOLDER" ] || [ ! -f $PRECISION100_CONF_FOLDER/.env.sh ]; then
+if [ -z "$PRECISION100_FOLDER" ] || [ ! -f $PRECISION100_FOLDER/conf/.env.sh ]; then
    echo "Misconfigured installation - Invalid Precision100 installation"
    exit 10
 fi
@@ -24,4 +24,4 @@ source $PRECISION100_FOLDER/conf/.env.sh
 
 source $PRECISION1OO_CONNECT_OPERATORS_FOLDER/secure-oracle/conf/.operator.env.sh
 
-echo $2 | openssl enc -e -aes-256-cbc -out $PRECSION100_CONF_FOLDER/"$1".enc -base64 -K $key -iv $iv
+echo $2 | openssl enc -e -aes-256-cbc -out ./conf/"$1".enc -base64 -K $key -iv $iv
