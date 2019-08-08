@@ -1,7 +1,8 @@
 CONTAINER=$1
 INDEX=$(echo $2 | cut -d ',' -f 1)
 FILE_NAME=$(echo $2 | cut -d ',' -f 2)
-CONNECTION_NAME=$(echo $2 | cut -d ',' -f 3)
+FILE_TYPE=$(echo $2 | cut -d ',' -f 3)
+CONNECTION_NAME=$(echo $2 | cut -d ',' -f 4)
 
 
 if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
@@ -13,7 +14,7 @@ fi
 
 echo "        START SQL_LOADER ADAPTOR $FILE_NAME"
 
-source $PRECISION100_FOLDER/conf/.operator.env.sh
+source $PRECISION100_OPERATORS_FOLDER/loader/conf/.operator.env.sh
 LOADER_FILE_NAME=${FILE_NAME%.*}
 CONTROL_FILE="$PRECISION100_EXECUTION_CONTAINER_FOLDER/$CONTAINER/$LOADER_FILE_NAME.ctl"
 DATA_FILE="$PRECISION100_OPERATOR_LOADER_INPUT_FOLDER/$LOADER_FILE_NAME.dat"
