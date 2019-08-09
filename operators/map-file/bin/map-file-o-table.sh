@@ -15,7 +15,7 @@ SOURCE_FILE=$2
 echo "DROP TABLE ${TABLE_NAME_PREFIX}_${TABLE_NAME};"
 echo "CREATE TABLE ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name data_type max_length mapping_code mapping_value;
 do
   if [[ -z "$column_name" ]]; then
     continue;
@@ -38,7 +38,7 @@ echo ");"
 echo "DROP TABLE ${REVERSE_TABLE_NAME_PREFIX}_${TABLE_NAME};"
 echo "CREATE TABLE ${REVERSE_TABLE_NAME_PREFIX}_${TABLE_NAME} ("
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name data_type max_length mapping_code mapping_value;
 do
   if [[ -z "$column_name" ]]; then
     continue;

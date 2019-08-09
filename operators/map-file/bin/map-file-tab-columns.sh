@@ -13,7 +13,7 @@ MAPPED_TABLE_NAME="${TABLE_NAME_PREFIX}_${TABLE_NAME}"
 echo "DELETE FROM O_TAB_COLUMNS WHERE TABLE_NAME = UPPER('${MAPPED_TABLE_NAME}');"
 
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name data_type max_length mapping_code mapping_value;
 do
   if [[ -z "$column_name" ]]; then
      continue;

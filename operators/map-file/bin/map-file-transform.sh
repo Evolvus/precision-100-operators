@@ -15,7 +15,7 @@ JOIN_FILE=$3
 echo "EXEC TRANSFORM_INTERCEPTOR('PRE','${TABLE_NAME}'); "
 echo "INSERT INTO ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name data_type max_length mapping_code mapping_value;
 do
   if [[ -z "$column_name" ]]; then
     continue;
