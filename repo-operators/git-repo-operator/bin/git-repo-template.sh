@@ -9,7 +9,7 @@ case "$REPO_ACTION" in
     git clone $3 $4
     ;;
   REFRESH)
-    git pull
+    git pull origin master
     ;;
   BRANCH)
     git branch "$3"
