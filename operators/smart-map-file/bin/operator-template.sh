@@ -30,6 +30,7 @@ function execute_sql() {
 sqlplus -s /nolog << EOL
 CONNECT $CONNECTION_STRING
 SET FEEDBACK OFF
+SET AUTO ON
 @$1
 exit
 EOL
