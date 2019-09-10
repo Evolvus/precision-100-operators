@@ -12,59 +12,90 @@ TABLE_NAME=$1
 SOURCE_FILE=$2
 JOIN_FILE=$3
 
-echo "EXEC TRANSFORM_INTERCEPTOR('PRE','${TABLE_NAME}'); "
-echo "INSERT INTO ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
-counter=0
-while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification mandatory info1 info2 info3;
-do
-  if [[ -z "$column_name" ]]; then
-    continue;
-  fi
-  if [[ counter -eq 0 ]]; then
-    counter=$counter+1;
-    continue;
-  fi
-  if [[ counter -eq 1 ]]; then
-    counter=$counter+1;
-    echo "  ${column_name:0:30}"
-    continue;
-  fi
-  counter=$counter+1;
-  echo ", ${column_name:0:30}"
-done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
-echo ") SELECT "
+#
+# $1 - counter
+# $2 - column name
+#
+function insert_column_defn() {
+  column="${2:0:30}"
 
-counter=0
-while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification mandatory info1 info2 info3;
-do
-  if [[ -z "$column_name" ]]; then
-    continue;
+  if [[ $1 -eq 1 ]]; then
+     echo "  $column"
+  else
+     echo ", $column"
   fi
-  if [[ counter -eq 0 ]]; then
-    counter=$counter+1;
-    continue;
-  fi
+}
 
-  echo " -- $column_name"
-  case "$mapping_code" in
+#
+# $1 - counter
+# $2 - column name
+# $3 - mapping code
+# $4 - mapping value
+# 
+function select_column_defn() {
+  echo " -- $2"
+  case "$3" in
    'CONSTANT')
-     column="'$mapping_value'"
+     column="'$4'"
     ;;
    'PASSTHRU')
-     column="$mapping_value"
+     column="$4"
     ;;
    *)
      column="NULL"
     ;;
   esac
 
-  if [[ counter -eq 1 ]]; then
+  if [[ $1 -eq 1 ]]; then
     echo "  $column"
   else
     echo ", $column"
   fi
-  counter=$counter+1;
-done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
+}
+
+
+#
+# $1 - SOURCE_FILE
+# $2 - mode INSERT | SELECT
+#
+function column_loop() {
+  counter=0
+  while IFS='~' read -r column_name old_column_name data_type max_length mapping_code mapping_value justification mandatory info1 info2 info3;
+  do
+    if [[ -z "$column_name" ]]; then
+      continue;
+    fi
+    if [[ counter -eq 0 ]]; then
+      counter=$counter+1;
+      continue;
+    fi
+
+    case "$2" in
+     'INSERT')
+       insert_column_defn $counter $column_name
+      ;;
+     'SELECT')
+       select_column_defn $counter $column_name $mapping_code $mapping_value
+      ;;
+     *)
+       echo "Invalid looping mode"
+       echo "Error: Invalid looping mode" 1>&2
+      ;;
+    esac
+
+    counter=$counter+1;
+  done < <(cat ${1} | tr '\t' '~' | tr -d '\r' | grep .)
+}
+
+echo "EXEC TRANSFORM_INTERCEPTOR('PRE','${TABLE_NAME}'); "
+echo "INSERT INTO ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
+column_loop $SOURCE_FILE 'INSERT'
+echo ") SELECT "
+column_loop $SOURCE_FILE 'SELECT'
+
+#
+# Now add the where clause for the select 
+#
 
 while IFS='~' read -r mapping_value;
 do
