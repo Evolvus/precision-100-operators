@@ -4,8 +4,9 @@ FILE_NAME=$(echo $2 | cut -d ',' -f 2)
 FILE_TYPE=$(echo $2 | cut -d ',' -f 3)
 DELIMITER=$(echo $2 | cut -d ',' -f 4)
 QUOTE=$(echo $2 | cut -d ',' -f 5)
-SPOOL_FILE_NAME=$(echo $2 | cut -d ',' -f 6)
-CONNECTION_NAME=$(echo $2 | cut -d ',' -f 7)
+HEADER=$(echo $2 | cut -d ',' -f 6)
+SPOOL_FILE_NAME=$(echo $2 | cut -d ',' -f 7)
+CONNECTION_NAME=$(echo $2 | cut -d ',' -f 8)
 
 if test "$PRECISION100_RUNTIME_SIMULATION_MODE" = "TRUE"; then
    echo "        START SPOOL ADAPTOR $FILE_NAME"
@@ -24,13 +25,47 @@ fi
 if [ -z "$QUOTE" ]; then
     QUOTE=${DEFAULT_QUOTE:-OFF}
 fi
+if [ -z "$HEADER" ]; then
+    HEADER=${DEFAULT_HEADER:-OFF}
+fi
+EXT=$(echo "${FILE_NAME#*.}" | tr [:lower:] [:upper:]) 
+
+SCRIPT="SELECT * FROM $FILE_NAME"
+if [ "${FILE_NAME#*.}" == "SQL" ]; then
+   SCRIPT="@$PRECISION100_CONTAINER_FOLDER/$CONTAINER/$FILE_NAME"
+fi	
+
+MARKUP="SET COLSEP $DELIMITER"
+if [ "$MARKUP_CSV_SUPPORTED" == "TRUE" ]; then
+   MARKUP="SET MARKUP CSV ON DELIMITER $DELIMITER QUOTE $QUOTE"
+fi
+if [ "$DELIMITER" == "FIXED" ]; then
+   MARKUP="SET COLSEP ''"
+fi
 
 SPOOL_FILE="$PRECISION100_OPERATOR_SPOOL_FOLDER/${SPOOL_FILE_NAME:-$FILE_NAME.csv}"
 CONNECTION_STRING=$($PRECISION100_BIN_FOLDER/get-connection-string.sh "$CONNECTION_NAME")
 
+function spool() {
+sqlplus -s /nolog  <<EOF >> /dev/null
+CONNECT $1
+SPOOL $2
+SET HEAD $3
+SET FEEDBACK OFF
+SET TERM OFF
+SET PAGES 0
+SET TRIM ON
+SET VERIFY OFF
+$4
+$5
+spool off;
+EOF
+}
+
 $PRECISION100_BIN_FOLDER/audit.sh  $0 "PRE-SPOOL" "$CONTAINER / $FILE_NAME" "SPOOL" $0 "START"
 
-$PRECISION100_OPERATORS_FOLDER/spool/bin/spool.sh $FILE_NAME $DELIMITER $QUOTE $SPOOL_FILE $CONNECTION_STRING
+spool $CONNECTION_STRING "$SPOOL_FILE" "$HEADER" "$MARKUP" "$SCRIPT"
+#$PRECISION100_OPERATORS_FOLDER/spool/bin/spool.sh $FILE_NAME $DELIMITER $QUOTE $SPOOL_FILE $CONNECTION_STRING
 
 $PRECISION100_BIN_FOLDER/audit.sh  $0 "POST-SPOOL" "$CONTAINER / $FILE_NAME" "SPOOL" $0 "END"
 
