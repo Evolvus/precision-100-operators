@@ -1,0 +1,5 @@
+echo "Executing t24-parameter-xml-csv on-exec"
+
+source $PRECISION100_OPERATORS_FOLDER/t24-parameter-xml-csv/conf/.operator.env.sh
+export PRECISION100_OPERATOR_T24_PARAMETER_XML_CSV_INPUT_FOLDER
+export PRECISION100_OPERATOR_T24_PARAMETER_XML_CSV_OUTPUT_FOLDER
