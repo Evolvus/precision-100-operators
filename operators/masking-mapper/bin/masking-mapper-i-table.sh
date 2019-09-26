@@ -19,5 +19,5 @@ do
   if [[ -z $enabled_flag ]]; then
     enabled_flag='Y'
   fi
-  echo "INSERT INTO MASKING_MAPPER ( SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, PHASE, MAPPING_METHOD, MAPPING_VALUE, UPDATE_WHERE, ENABLED ) VALUES ( UPPER('${schema_name}'), UPPER('${table_name}'), UPPER('${column_name}'), UPPER('${phase}'), UPPER('${mapping_method}'), UPPER('${mapping_value}'), UPPER('${update_where}'), UPPER('${enabled_flag}') );"
+  echo "INSERT INTO MASKING_MAPPER ( SCHEMA_NAME, TABLE_NAME, COLUMN_NAME, PHASE, MASKING_METHOD, MASKING_VALUE, UPDATE_WHERE, ENABLED ) VALUES ( UPPER('${schema_name}'), UPPER('${table_name}'), UPPER('${column_name}'), UPPER('${phase}'), UPPER('${mapping_method}'), UPPER('${mapping_value}'), UPPER('${update_where}'), UPPER('${enabled_flag}') );"
 done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
