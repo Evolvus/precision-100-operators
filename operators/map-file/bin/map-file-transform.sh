@@ -12,6 +12,29 @@ TABLE_NAME=$1
 SOURCE_FILE=$2
 JOIN_FILE=$3
 
+
+function resolve_mapping_value() { 
+  mapping_code=$1
+  mapping_value=$2
+  case "$mapping_code" in
+   'CONVERT_CODES')
+     key=$(echo $mapping_value | cut -d , -f 1)
+     field=$(echo $mapping_value | cut -d , -f 2)
+     column="CONVERT_CODES('$key','$field')"
+     ;;
+   'CONSTANT')
+     column="'$mapping_value'"
+    ;;
+   'PASSTHRU')
+     column="$mapping_value"
+    ;;
+   *)
+     column="NULL"
+    ;;
+  esac
+  echo $column
+}
+
 echo "EXEC TRANSFORM_INTERCEPTOR('PRE','${TABLE_NAME}'); "
 echo "INSERT INTO ${TABLE_NAME_PREFIX}_${TABLE_NAME} ("
 counter=0
@@ -35,7 +58,7 @@ done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
 echo ") SELECT "
 
 counter=0
-while IFS=$MAP_FILE_DELIMITER read -r column_name data_type max_length mapping_code mapping_value;
+while IFS='~' read -r column_name data_type max_length mapping_code mapping_value;
 do
   if [[ -z "$column_name" ]]; then
     continue;
@@ -46,17 +69,7 @@ do
   fi
 
   echo " -- $column_name"
-  case "$mapping_code" in
-   'CONSTANT')
-     column="'$mapping_value'"
-    ;;
-   'PASSTHRU')
-     column="$mapping_value"
-    ;;
-   *)
-     column="NULL"
-    ;;
-  esac
+  column=$(resolve_mapping_value "$mapping_code" "$mapping_value")
 
   if [[ counter -eq 1 ]]; then
     echo "  $column"
@@ -66,7 +79,7 @@ do
   counter=$counter+1;
 done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
 
-while IFS=$MAP_FILE_DELIMITER read -r mapping_value;
+while IFS='~' read -r mapping_value;
 do
   if [[ -z "$mapping_value" ]]; then
     continue;

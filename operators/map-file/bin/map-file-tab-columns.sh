@@ -25,6 +25,9 @@ do
   if [[ -z $max_length ]]; then
      max_length=0
   fi
+  if [[ -z "$mapping_code" ]]; then
+     mapping_code='UNMAPPED';
+  fi
   if [[ ! "$mapping_code" = "CONSTANT" ]]; then
      mapping_value=' ';
   fi
