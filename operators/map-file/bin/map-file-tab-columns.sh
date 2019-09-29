@@ -25,5 +25,5 @@ do
   if [[ -z $max_length ]]; then
      max_length=0
   fi
-  echo "INSERT INTO O_TAB_COLUMNS ( TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, MAPPING_TYPE, MAPPING_VALUE ) VALUES ( UPPER('${MAPPED_TABLE_NAME}'), UPPER('$column_name'), UPPER('$data_type'), $max_length, UPPER('$mapping_type'), UPPER('${mapping_value}') );"
+  echo "INSERT INTO O_TAB_COLUMNS ( TABLE_NAME, COLUMN_NAME, DATA_TYPE, DATA_LENGTH, MAPPING_TYPE, MAPPING_VALUE ) VALUES ( UPPER('${MAPPED_TABLE_NAME}'), UPPER('$column_name'), UPPER('$data_type'), $max_length, UPPER('$mapping_code'), UPPER('${mapping_value}') );"
 done < <(cat ${SOURCE_FILE} | tr '\t' '~' | tr -d '\r' | grep .)
