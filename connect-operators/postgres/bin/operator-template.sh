@@ -1,5 +1,5 @@
 CONFIG_STRING=$1
-source $PRECISION100_CONNECT_OPERATORS_FOLDER/oracle/conf/.operator.env.sh
+source $PRECISION100_CONNECT_OPERATORS_FOLDER/postgress/conf/.operator.env.sh
 
 CONNECTION_NAME=$(echo $CONFIG_STRING | cut -d "$CONFIG_SEPARATOR" -f $NAME_INDEX)
 CONNECTION_TYPE=$(echo $CONFIG_STRING | cut -d "$CONFIG_SEPARATOR" -f $TYPE_INDEX)
@@ -9,4 +9,4 @@ HOST=$(echo $CONFIG_STRING | cut -d "$CONFIG_SEPARATOR" -f $HOST_INDEX)
 PORT=$(echo $CONFIG_STRING | cut -d "$CONFIG_SEPARATOR" -f $PORT_INDEX)
 DBNAME=$(echo $CONFIG_STRING | cut -d "$CONFIG_SEPARATOR" -f $DBNAME_INDEX)
 
-echo "host=$HOST port=$PORT dbname=$DBNAME user=$USER password=$PASSWORD" 
+echo "host=$HOST port=$PORT dbname=$DBNAME user=$USERNAME password=$PASSWORD" 
