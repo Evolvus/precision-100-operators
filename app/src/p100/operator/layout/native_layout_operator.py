@@ -2,17 +2,14 @@ import os, logging
 import csv
 
 PARAM_PROJECT_REG_FILE_URL = "project_reg_file"
-PARAM_OPERATION_MODE = "operation_mode"
 
 logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
     def get_dataflows(self, **context):
-     # Get the context
-        project_reg_file = context[PARAM_PROJECT_REG_FILE_URL]
-        operation_mode = context[PARAM_OPERATION_MODE]
+        logger.info(f"Getting dataflows with context: {context}")
 
-        logger.info(f"Reading project reference file: {project_reg_file} for operation mode: {operation_mode}")
+        project_reg_file = context[PARAM_PROJECT_REG_FILE_URL]
 
         if not os.path.isfile(project_reg_file):
             logger.error(f"Project reference file does not exist: {project_reg_file}")
