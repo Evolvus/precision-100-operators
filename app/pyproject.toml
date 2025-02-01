@@ -1,0 +1,38 @@
+[project]
+name = "precision-100-operators"
+version = "0.0.1"
+authors = [
+  { name="ennovatenow", email="ennovatenow@evolvus.com" },
+]
+description = "Default operators for precision 100"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+where= ["src"]
+
+[tool.setuptools.package-data]
+"p100_plugin" = ["*.toml"]
+
+[project.urls]
+Homepage = "https://github.com/Evolvus/precision-100-operators"
+Issues = "https://github.com/Evolvus/precision-100-operators/issues"
+
+[project.entry-points."p100.operator"]
+add_one = "p100_plugin:add_one"
+add_two = "p100_plugin:add_two"
+sh = "p100_plugin:shell"
+shell = "p100_plugin:shell"
+psql = "p100_plugin:psql"
+
+[project.entry-points."p100.operator.repo"]
+file_repo_operator = "p100:file_repo_operator"
