@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.0.1"
+version = "0.0.8"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -35,4 +35,4 @@ shell = "p100_plugin:shell"
 psql = "p100_plugin:psql"
 
 [project.entry-points."p100.operator.repo"]
-file_repo_operator = "p100:file_repo_operator"
+FILE = "p100.operator:execute_file_repo_operator"
