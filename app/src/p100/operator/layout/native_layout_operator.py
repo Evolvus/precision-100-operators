@@ -7,7 +7,7 @@ PARAM_OPERATION_MODE = "operation_mode"
 logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
-    def get_dataflows(**context):
+    def get_dataflows(self, **context):
      # Get the context
         project_reg_file = context[PARAM_PROJECT_REG_FILE_URL]
         operation_mode = context[PARAM_OPERATION_MODE]
