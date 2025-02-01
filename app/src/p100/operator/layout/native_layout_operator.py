@@ -2,14 +2,22 @@ import os, logging
 import csv
 
 PARAM_PROJECT_REG_FILE_URL = "project_reg_file"
+PARAM_ENV = "env"
 
 logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
     def get_dataflows(self, **context):
         logger.info(f"Getting dataflows with context: {context}")
+        my_env = context[PARAM_ENV]
 
-        project_reg_file = context[PARAM_PROJECT_REG_FILE_URL]
+        #Get the value of the PRECISION100_PROJECT_CONF_FOLDER from my_env
+        conf_folder = my_env.get("PRECISION100_EXECUTION_DATAFLOW_FOLDER")
+        if not conf_folder:
+            logger.error("Environment variable PRECISION100_PROJECT_CONF_FOLDER is not set in the provided environment context")
+            return {}
+
+        project_reg_file = os.path.join(conf_folder, "project.reg")
 
         if not os.path.isfile(project_reg_file):
             logger.error(f"Project reference file does not exist: {project_reg_file}")
