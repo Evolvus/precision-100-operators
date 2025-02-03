@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.1.5"
+version = "0.2.6"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -30,8 +30,8 @@ Issues = "https://github.com/Evolvus/precision-100-operators/issues"
 [project.entry-points."p100.operator"]
 add_one = "p100_plugin:add_one"
 add_two = "p100_plugin:add_two"
-sh = "p100_plugin:shell"
-shell = "p100_plugin:shell"
+SH = "p100.operator:sh_operator"
+SHELL = "p100.operator:sh_operator"
 psql = "p100_plugin:psql"
 
 [project.entry-points."p100.operator.repo"]
