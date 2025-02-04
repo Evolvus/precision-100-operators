@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.2.6"
+version = "0.3.7"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -32,7 +32,7 @@ add_one = "p100_plugin:add_one"
 add_two = "p100_plugin:add_two"
 SH = "p100.operator:sh_operator"
 SHELL = "p100.operator:sh_operator"
-psql = "p100_plugin:psql"
+PSQL = "p100.operator:psql_operator"
 
 [project.entry-points."p100.operator.repo"]
 FILE = "p100.operator:execute_file_repo_operator"
@@ -40,3 +40,6 @@ GIT = "p100.operator:execute_git_repo_operator"
 
 [project.entry-points."p100.operator.layout"]
 NATIVE = "p100.operator:execute_native_layout_operator"
+
+[project.entry-points."p100.operator.connect"]
+NATIVE = "p100.operator:execute_native_connect_operator"

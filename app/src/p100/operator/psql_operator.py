@@ -1,12 +1,16 @@
 import os, logging
 import subprocess, threading
 
+CONNECTION_TYPE = "PSQL"
+
 logger = logging.getLogger(__name__)
 
 
 def execute(line, **context):
-    logger.info(f"Executing sh operator {line}")
-    logger.debug(f"Executing sh operator with {line} parameters and context: {context}")
+    logger.info(f"Executing psql operator {line}")
+    logger.debug(
+        f"Executing psql operator with {line} parameters and context: {context}"
+    )
 
     layout_operator_lookup = context.get("__LAYOUT_OPERATOR__")
     if not layout_operator_lookup:
@@ -25,15 +29,30 @@ def execute(line, **context):
         logger.error("No script name provided in __PARAM0__")
         return -1
 
-    # Collect the script parameters
-    script_params = []
-    i = 1
-    while f"__PARAM{i}__" in line:
-        script_params.append(line[f"__PARAM{i}__"])
-        i += 1
+    connection_name = line.get("__PARAM1__")
+    if not connection_name:
+        logger.error("No connection name provided in __PARAM1__")
+        return -1
+
+    # Get the connection details
+    connect_operator_lookup = context.get("__CONNECT_OPERATOR__")
+    if not connect_operator_lookup:
+        logger.error("Connect operator not provided in context")
+        return -1
+
+    connection_parts = connect_operator_lookup(
+        CONNECTION_TYPE, connection_name, **context
+    )
+    connection_string = f"host={connection_parts.get('__PARAM3__')} port={connection_parts.get('__PARAM4__')} dbname={connection_parts.get('__PARAM5__')} user={connection_parts.get('__PARAM6__')} password={connection_parts.get('__PARAM7__')}"
+    logger.info(f"Connection string: {connection_string}")
 
     # Construct the command
-    command = [script_name] + script_params
+    command = [
+        "psql",
+        connection_string,
+        "-f",
+        script_name,
+    ]
     logger.info(f"Executing command: {command}")
 
     # Execute the command
