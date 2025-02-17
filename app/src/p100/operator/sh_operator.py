@@ -1,5 +1,6 @@
 import os, logging
 import subprocess, threading
+from .cmdline_operator import execute_cmd
 
 logger = logging.getLogger(__name__)
 
@@ -34,39 +35,4 @@ def execute(line, **context):
 
     # Construct the command
     command = [script_name] + script_params
-    logger.info(f"Executing command: {command}")
-
-    # Execute the command
-    try:
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
-
-        def output_info(stream):
-            for line in stream:
-                logger.info(line.strip())
-
-        def output_error(stream):
-            for line in stream:
-                logger.error(line.strip())
-
-        stdout_thread = threading.Thread(target=output_info, args=(process.stdout,))
-        stderr_thread = threading.Thread(target=output_error, args=(process.stderr,))
-
-        stdout_thread.start()
-        stderr_thread.start()
-
-        process.wait()
-
-        stdout_thread.join()
-        stderr_thread.join()
-
-        return process.returncode
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Error executing script: {e}")
-        return -1
-
-    return 0
+    return execute_cmd(command)
