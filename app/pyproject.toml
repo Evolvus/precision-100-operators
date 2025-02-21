@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.3.7.2"
+version = "0.3.9.0"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -33,6 +33,10 @@ add_two = "p100_plugin:add_two"
 SH = "p100.operator:sh_operator"
 SHELL = "p100.operator:sh_operator"
 PSQL = "p100.operator:psql_operator"
+PSQL_SPOOL = "p100.operator:psql_spool_operator"
+PSQL_IMPORT = "p100.operator:psql_import_operator"
+CSV2PARQUET = "p100.operator:csv_to_parquet_operator"
+
 
 [project.entry-points."p100.operator.repo"]
 FILE = "p100.operator:execute_file_repo_operator"

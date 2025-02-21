@@ -114,11 +114,44 @@ class NativeLayoutOperator:
         logger.info(f"Lookup {file} for dataflow: {dataflow} container: {container}")
         my_env = context[PARAM_ENV]
 
-        container_folder = my_env.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
-        if not container_folder:
-            logger.error("Environment variable PRECISION100_EXECUTION_CONTAINER_FOLDER is not set in the provided environment context")
-            return ""
 
-        path = os.path.join(container_folder, container, file)
+        project_folder = my_env.get("PRECISION100_PROJECT_FOLDER")
+        container_folder = my_env.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
+        output_folder = my_env.get("PRECISION100_EXECUTION_OUTPUT_FOLDER")
+
+        if file.startswith("project://"):
+            norm_file_path = os.path.normpath(file[10:])
+            path = os.path.join(project_folder, norm_file_path)
+            # if path is not below project folder, return None
+            if not path.startswith(project_folder):
+                logger.error(f"Invalid project path: {path}")
+                return ""
+            
+            logger.info(f"Lookup project path: {path}")
+            return str(path)
+        
+        if file.startswith("output://"):
+            norm_file_path = os.path.normpath(file[9:])
+            path = os.path.join(output_folder, norm_file_path)
+            if not path.startswith(output_folder):
+                logger.error(f"Invalid output path: {path}")
+                return ""
+
+            logger.info(f"Lookup output path: {path}")
+            return str(path)
+        
+        if file.startswith("container://"):
+            norm_file_path = os.path.normpath(file[12:])
+            path = os.path.join(container_folder, container, norm_file_path)
+            if not path.startswith(container_folder):
+                logger.error(f"Invalid container path: {path}")
+                return ""
+            
+            logger.info(f"Lookup path: {path}")
+            return str(path)
+
+        # if not prefix is provided, assume it is a container file
+        norm_file_path = os.path.normpath(file)
+        path = os.path.join(container_folder, container, norm_file_path)
         logger.info(f"Lookup path: {path}")
         return str(path)
