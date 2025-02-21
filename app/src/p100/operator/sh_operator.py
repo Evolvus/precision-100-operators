@@ -6,8 +6,8 @@ logger = logging.getLogger(__name__)
 
 
 def execute(line, **context):
-    logger.info(f"Executing sh operator {line}")
-    logger.debug(f"Executing sh operator with {line} parameters and context: {context}")
+    logger.info(f"Executing {__name__} operator {line}")
+    logger.debug(f"Executing {__name__} operator with {line} parameters and context: {context}")
 
     layout_operator_lookup = context.get("__LAYOUT_OPERATOR__")
     if not layout_operator_lookup:
