@@ -8,7 +8,8 @@ logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
     def get_dataflows(self, **context):
-        logger.info(f"Getting dataflows with context: {context}")
+        logger.info(f"Getting dataflows")
+        logger.debug(f"Getting dataflows with context: {context}")
         my_env = context[PARAM_ENV]
 
         #Get the value of the PRECISION100_PROJECT_CONF_FOLDER from my_env
@@ -39,6 +40,7 @@ class NativeLayoutOperator:
 
     def get_containers(self, dataflow, **context):
         logger.info(f"Getting containers for dataflow: {dataflow}")
+        logger.debug(f"Getting containers for dataflow: {dataflow} with context: {context}")
         my_env = context[PARAM_ENV]
 
         dataflow_reg = dataflow.split(",")[1]
@@ -65,7 +67,8 @@ class NativeLayoutOperator:
 
 
     def get_instructions(self, dataflow, container, **context):
-        logger.info(f"Getting containers for dataflow: {dataflow} container: {container}")
+        logger.info(f"Getting instructions for dataflow: {dataflow} container: {container}")
+        logger.debug(f"Getting instructions for dataflow: {dataflow} container: {container} with context: {context}")
         my_env = context[PARAM_ENV]
 
         #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER from my_env
@@ -92,6 +95,7 @@ class NativeLayoutOperator:
 
     def get_instruction(self, dataflow, container, instruction, **context):
         logger.info(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction}")
+        logger.debug(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction} with context: {context}")
 
         instruction_parts = instruction.strip().split(',')
         if len(instruction_parts) < 3:
@@ -112,6 +116,7 @@ class NativeLayoutOperator:
 
     def lookup(self, dataflow, container, file, **context):
         logger.info(f"Lookup {file} for dataflow: {dataflow} container: {container}")
+        logger.debug(f"Lookup {file} for dataflow: {dataflow} container: {container} with context: {context}")
         my_env = context[PARAM_ENV]
 
 
