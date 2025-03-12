@@ -123,6 +123,17 @@ class NativeLayoutOperator:
         project_folder = my_env.get("PRECISION100_PROJECT_FOLDER")
         container_folder = my_env.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
         output_folder = my_env.get("PRECISION100_EXECUTION_OUTPUT_FOLDER")
+        temp_folder = my_env.get("PRECISION100_EXECUTION_TEMP_FOLDER")
+
+        if file.startswith("temp://"):
+            norm_file_path = os.path.normpath(file[7:])
+            path = os.path.join(temp_folder, norm_file_path)
+            if not path.startswith(temp_folder):
+                logger.error(f"Invalid temp path: {path}")
+                return ""
+            
+            logger.debug(f"Lookup temp path: {path}")
+            return str(path)
 
         if file.startswith("project://"):
             norm_file_path = os.path.normpath(file[10:])
@@ -132,7 +143,7 @@ class NativeLayoutOperator:
                 logger.error(f"Invalid project path: {path}")
                 return ""
             
-            logger.info(f"Lookup project path: {path}")
+            logger.debug(f"Lookup project path: {path}")
             return str(path)
         
         if file.startswith("output://"):
@@ -142,7 +153,7 @@ class NativeLayoutOperator:
                 logger.error(f"Invalid output path: {path}")
                 return ""
 
-            logger.info(f"Lookup output path: {path}")
+            logger.debug(f"Lookup output path: {path}")
             return str(path)
         
         if file.startswith("container://"):
@@ -152,11 +163,11 @@ class NativeLayoutOperator:
                 logger.error(f"Invalid container path: {path}")
                 return ""
             
-            logger.info(f"Lookup path: {path}")
+            logger.debug(f"Lookup path: {path}")
             return str(path)
 
         # if not prefix is provided, assume it is a container file
         norm_file_path = os.path.normpath(file)
         path = os.path.join(container_folder, container, norm_file_path)
-        logger.info(f"Lookup path: {path}")
+        logger.debug(f"Lookup path: {path}")
         return str(path)
