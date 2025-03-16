@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.3.9.4"
+version = "0.4.0"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -44,6 +44,7 @@ GIT = "p100.operator:execute_git_repo_operator"
 
 [project.entry-points."p100.operator.layout"]
 NATIVE = "p100.operator:execute_native_layout_operator"
+NATIVE1 = "p100.operator:execute_native_one_layout_operator"
 
 [project.entry-points."p100.operator.connect"]
 NATIVE = "p100.operator:execute_native_connect_operator"
