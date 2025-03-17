@@ -7,12 +7,12 @@ PARAM_ENV = "env"
 logger = logging.getLogger(__name__)
 
 class NativeOneLayoutOperator:
-    def get_dataflows(self, **context):
+    def get_dataflows(self, project_config, execution_config, **context):
         logger.info(f"Getting dataflows")
         logger.debug(f"Getting dataflows with context: {context}")
 
-        #Get the value of the PRECISION100_PROJECT_DATAFLOW_FOLDER from my_env
-        conf_folder = context.get("PRECISION100_EXECUTION_DATAFLOW_FOLDER")
+        #Get the value of the PRECISION100_EXECUTION_DATAFLOW_FOLDER
+        conf_folder = execution_config.get("PRECISION100_EXECUTION_DATAFLOW_FOLDER")
         if not conf_folder:
             logger.error("PRECISION100_PROJECT_DATALFOW_FOLDER is not set in the provided environment context")
             return {}
@@ -37,14 +37,14 @@ class NativeOneLayoutOperator:
         return project_data
 
 
-    def get_containers(self, dataflow, **context):
+    def get_containers(self, project_config, execution_config, dataflow, **context):
         logger.info(f"Getting containers for dataflow: {dataflow}")
         logger.debug(f"Getting containers for dataflow: {dataflow} with context: {context}")
 
         dataflow_reg = dataflow.split(",")[1]
 
         #Get the value of the PRECISION100_EXECUTION_DATAFLOW_FOLDER from my_env
-        dataflow_folder = context.get("PRECISION100_EXECUTION_DATAFLOW_FOLDER")
+        dataflow_folder = execution_config.get("PRECISION100_EXECUTION_DATAFLOW_FOLDER")
         if not dataflow_folder:
             logger.error("Environment variable PRECISION100_EXECUTION_DATAFLOW_FOLDER is not set in the provided environment context")
             return []
@@ -64,13 +64,12 @@ class NativeOneLayoutOperator:
         return container_list
 
 
-    def get_instructions(self, dataflow, container, **context):
+    def get_instructions(self, project_config, execution_config, dataflow, container, **context):
         logger.info(f"Getting instructions for dataflow: {dataflow} container: {container}")
         logger.debug(f"Getting instructions for dataflow: {dataflow} container: {container} with context: {context}")
-        my_env = context[PARAM_ENV]
 
         #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER from context
-        container_folder = context.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
+        container_folder = execution_config.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
         if not container_folder:
             logger.error("Environment variable PRECISION100_EXECUTION_CONTAINER_FOLDER is not set in the provided environment context")
             return []
@@ -85,13 +84,13 @@ class NativeOneLayoutOperator:
         with open(container_reg_file, "r") as f:
             for line in f:
                 logger.info(f"Instruction: {line.strip()}")
-                instruction = self.get_instruction(dataflow, container, line.strip(), **context)
+                instruction = self.get_instruction(project_config, execution_config, dataflow, container, line.strip(), **context)
                 logger.info(f"Instruction: {instruction}")
                 instruction_list.append(instruction)
 
         return instruction_list
 
-    def get_instruction(self, dataflow, container, instruction, **context):
+    def get_instruction(self, project_config, execution_config, dataflow, container, instruction, **context):
         logger.info(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction}")
         logger.debug(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction} with context: {context}")
 
@@ -111,14 +110,14 @@ class NativeOneLayoutOperator:
         return instruction_context
 
 
-    def lookup(self, dataflow, container, file, **context):
+    def lookup(self, project_config, execution_config, dataflow, container, file, **context):
         logger.info(f"Lookup {file} for dataflow: {dataflow} container: {container}")
         logger.debug(f"Lookup {file} for dataflow: {dataflow} container: {container} with context: {context}")
 
-        project_folder = context.get("PRECISION100_PROJECT_FOLDER")
-        container_folder = context.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
-        output_folder = context.get("PRECISION100_EXECUTION_OUTPUT_FOLDER")
-        temp_folder = context.get("PRECISION100_EXECUTION_TEMP_FOLDER")
+        project_folder = project_config.get("PRECISION100_PROJECT_FOLDER")
+        container_folder = execution_config.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
+        output_folder = execution_config.get("PRECISION100_EXECUTION_OUTPUT_FOLDER")
+        temp_folder = execution_config.get("PRECISION100_EXECUTION_TEMP_FOLDER")
 
         if file.startswith("temp://"):
             norm_file_path = os.path.normpath(file[7:])
