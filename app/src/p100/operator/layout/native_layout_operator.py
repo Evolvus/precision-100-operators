@@ -27,6 +27,9 @@ class NativeLayoutOperator:
         with open(project_reg_file, "r") as f:
             reader = csv.reader(f)
             for row in reader:
+                if row[0].strip().startswith("#"):
+                    continue
+
                 if len(row) != 2:
                     logger.error(f"Invalid row in project reference file: {row}")
                     continue
@@ -58,6 +61,8 @@ class NativeLayoutOperator:
         container_list = []
         with open(dataflow_reg_file, "r") as f:
             for line in f:
+                if(line.strip().startswith("#")):
+                    continue
                 logger.info(f"Container reference: {line.strip()}")
                 container_list.append(line.strip())
 
@@ -84,6 +89,8 @@ class NativeLayoutOperator:
         instruction_list = []
         with open(container_reg_file, "r") as f:
             for line in f:
+                if line.isspace() or line.startswith("#"):
+                    continue
                 logger.info(f"Instruction: {line.strip()}")
                 instruction = self.get_instruction(project_config, execution_config, dataflow, container, line.strip(), **context)
                 logger.info(f"Instruction: {instruction}")

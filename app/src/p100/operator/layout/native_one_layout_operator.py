@@ -70,10 +70,6 @@ class NativeOneLayoutOperator:
 
         #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER from context
         container_folder = execution_config.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
-        if not container_folder:
-            logger.error("Environment variable PRECISION100_EXECUTION_CONTAINER_FOLDER is not set in the provided environment context")
-            return []
-
         container_reg_file = os.path.join(container_folder, container, "container.reg")
 
         if not os.path.isfile(container_reg_file):
@@ -84,6 +80,8 @@ class NativeOneLayoutOperator:
         with open(container_reg_file, "r") as f:
             for line in f:
                 logger.info(f"Instruction: {line.strip()}")
+                if line.isspace() or line.startswith("#"):
+                    continue
                 instruction = self.get_instruction(project_config, execution_config, dataflow, container, line.strip(), **context)
                 logger.info(f"Instruction: {instruction}")
                 instruction_list.append(instruction)
