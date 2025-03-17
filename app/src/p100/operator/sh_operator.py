@@ -24,7 +24,7 @@ def execute(project_config, execution_config, line, **context):
 
     # Get the shell script name
     script_name = layout_operator_lookup(
-        dataflow, container, line.get("__PARAM0__"), **context
+        project_config, execution_config, dataflow, container, line.get("__PARAM0__"), **context
     )
 
     # Collect the script parameters
