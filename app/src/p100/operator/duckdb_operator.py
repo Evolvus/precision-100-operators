@@ -7,7 +7,7 @@ CONNECTION_TYPE = "DUCKDB"
 logger = logging.getLogger(__name__)
 
 
-def execute(line, **context):
+def execute(project_config, execution_config, line, **context):
     logger.info(f"Executing {OPERATOR_NAME} operator {line}")
     logger.debug(
         f"Executing {OPERATOR_NAME} with {line} parameters and context: {context}"
@@ -25,7 +25,7 @@ def execute(line, **context):
 
     # Get the shell script name
     script_name = layout_operator_lookup(
-        dataflow, container, line.get("__PARAM0__"), **context
+        project_config, execution_config, dataflow, container, line.get("__PARAM0__"), **context
     )
 
     if not script_name:
