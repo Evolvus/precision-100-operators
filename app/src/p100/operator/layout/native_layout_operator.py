@@ -7,6 +7,12 @@ PARAM_ENV = "env"
 logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
+    def is_comment(self, line):
+        return line.strip().startswith("#")
+    
+    def is_whitespace(self, line):
+        return line.isspace()
+
     def get_dataflows(self, project_config, execution_config, **context):
         logger.info(f"Getting dataflows")
         logger.debug(f"Getting dataflows with context: {context}")
@@ -25,17 +31,14 @@ class NativeLayoutOperator:
 
         project_data = {}
         with open(project_reg_file, "r") as f:
-            reader = csv.reader(f)
+            reader = csv.reader(f, is_comment=self.is_comment, is_whitespace=self.is_whitespace)
             for row in reader:
-                if row[0].strip().startswith("#"):
-                    continue
-
                 if len(row) != 2:
                     logger.error(f"Invalid row in project reference file: {row}")
                     continue
                 description, data_flow_id = row
                 project_data[description] = data_flow_id
-                logger.info(f"Project reference: {description} -> {data_flow_id}")
+                logger.debug(f"Project reference: {description} -> {data_flow_id}")
 
         return project_data
 
@@ -72,9 +75,10 @@ class NativeLayoutOperator:
     def get_instructions(self, project_config, execution_config, dataflow, container, **context):
         logger.info(f"Getting instructions for dataflow: {dataflow} container: {container}")
         logger.debug(f"Getting instructions for dataflow: {dataflow} container: {container} with context: {context}")
-        my_env = context[PARAM_ENV]
 
-        #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER from my_env
+        
+
+        #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER
         container_folder = execution_config.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
         if not container_folder:
             logger.error("Environment variable PRECISION100_EXECUTION_CONTAINER_FOLDER is not set in the provided environment context")
@@ -98,11 +102,11 @@ class NativeLayoutOperator:
 
         return instruction_list
 
-    def get_instruction(self, project_config, execution_config, dataflow, container, instruction, **context):
+    def get_instruction(self, project_config, execution_config, dataflow, container, instruction, delimiter=",", **context):
         logger.info(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction}")
         logger.debug(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction} with context: {context}")
 
-        instruction_parts = instruction.strip().split(',')
+        instruction_parts = instruction.strip().split(delimiter)
         if len(instruction_parts) < 3:
            logger.error(f"Invalid instruction line: {instruction.strip()}")
            return {}
