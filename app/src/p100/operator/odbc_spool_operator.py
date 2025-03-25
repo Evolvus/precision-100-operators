@@ -1,11 +1,11 @@
 import logging
-from .cmdline_operator import execute_cmd, execute_internal
+from .cmdline_operator import execute_cmd, execute_internal, resolve_delimiter
 
 logger = logging.getLogger(__name__)
 
 def validate(line, **context):
     if not line.get("__PARAM0__"):
-        logger.error("No script name provided in __PARAM0__")
+        logger.error("No sql provided in __PARAM0__")
         return -1
     
     if not line.get("__PARAM1__"):
@@ -23,26 +23,37 @@ def execute(line, **context):
     if status != 0:
         return status
 
-    # Get the sql script name
-    script_name = layout_operator_lookup(
-        dataflow, container, line.get("__PARAM0__"), **context
-    )
-    if not script_name:
-        logger.error("Unable to resolve script name")
-        return -1
+    # Get the sql 
+    sql = line.get("__PARAM0__")
 
     dsn_name = connection_parts.get('__PARAM3__')
     username = connection_parts.get('__PARAM4__')
     password = connection_parts.get('__PARAM5__')
 
-    connection_string = f"-S{dsn_name} -U {username} -P {password}"
+    connection_string = f"{dsn_name} {username} {password}"
     logger.info(f"Connection string: {connection_string}")
+
+    delimiter = default_values.get("DELIMITER", ",")
+    header = default_values.get("HEADER", "YES")
+    quote = default_values.get("QUOTE", "YES")
+
+    delimiter = line.get("__PARAM2__", delimiter)
+    if delimiter:
+        delimiter = resolve_delimiter(delimiter)
+    header = line.get("__PARAM3__", header)
+    quote = line.get("__PARAM4__", quote)
 
     # Construct the command
     command = [
         "isql",
         connection_string,
-        "-i",
-        script_name,
+        "-b",
+        f"-d{delimiter}",
     ]
-    return execute_cmd(command)
+    if header == "YES":
+        command.append("-c")
+    
+    if quote == "YES":
+        command.append("-q")
+
+    return execute_cmd(command=command, input=sql)

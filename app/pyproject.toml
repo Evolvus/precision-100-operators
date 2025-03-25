@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.4.6
+version = "0.4.7"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]
@@ -24,7 +24,7 @@ where= ["src"]
 script-files = [ "src/p100/operator/length-validator-generator.sh" ]
 
 [tool.setuptools.package-data]
-"p100_plugin" = ["*.toml"]
+"p100.operator" = ["resources/config.toml"]
 
 [project.urls]
 Homepage = "https://github.com/Evolvus/precision-100-operators"
@@ -36,6 +36,7 @@ add_two = "p100_plugin:add_two"
 SH = "p100.operator:sh_operator"
 SHELL = "p100.operator:sh_operator"
 CSV2PARQUET = "p100.operator:csv_to_parquet_operator"
+ODBC_SPOOL = "p100.operator:odbc_spool_operator"
 
 
 [project.entry-points."p100.operator.repo"]

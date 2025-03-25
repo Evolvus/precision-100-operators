@@ -5,16 +5,31 @@ import tomllib as toml
 
 logger = logging.getLogger(__name__)
 
- # Execute the command
-def execute_cmd(command):
-    logger.info(f"Executing command: {command}")
+# Execute the command
+def execute_cmd(command, env_vars=None, input=None):
+    logger.debug(f"Executing command: {command}")
     try:
-        process = subprocess.Popen(
-            command,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-            text=True,
-        )
+        env = os.environ.copy()
+        if env_vars:
+            env.update(env_vars)
+
+        if input:
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                text=True,
+                env=env,
+            )
+        else:
+            process = subprocess.Popen(
+                command,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+                text=True,
+                env=env,
+            )
 
         def output_info(stream):
             for line in stream:
@@ -30,7 +45,10 @@ def execute_cmd(command):
         stdout_thread.start()
         stderr_thread.start()
 
-        process.wait()
+        if input:
+            process.communicate(input=input)
+        else:
+            process.wait()
 
         stdout_thread.join()
         stderr_thread.join()

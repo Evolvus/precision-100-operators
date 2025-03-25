@@ -12,3 +12,5 @@ from p100.operator.csv_to_parquet_operator import execute as csv_to_parquet_oper
 from p100.operator.connect.native_connect_store_operator import (
     lookup as execute_native_connect_operator,
 )
+
+from p100.operator.odbc_spool_operator import execute as odbc_spool_operator
