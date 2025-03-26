@@ -6,7 +6,7 @@ import tomllib as toml
 logger = logging.getLogger(__name__)
 
 # Execute the command
-def execute_cmd(command, env_vars=None, input=None):
+def execute_cmd(command, env_vars=None, input=None, output=None):
     logger.debug(f"Executing command: {command}")
     try:
         env = os.environ.copy()
@@ -39,7 +39,15 @@ def execute_cmd(command, env_vars=None, input=None):
             for line in stream:
                 logger.error(line.strip())
 
-        stdout_thread = threading.Thread(target=output_info, args=(process.stdout,))
+        def output_to_file(stream):
+            with open(output, "w") as f:
+                for line in stream:
+                    f.write(f"{line.strip()}\n")
+
+        if output:
+            stdout_thread = threading.Thread(target=output_to_file, args=(process.stdout,))
+        else:
+            stdout_thread = threading.Thread(target=output_info, args=(process.stdout,))
         stderr_thread = threading.Thread(target=output_error, args=(process.stderr,))
 
         stdout_thread.start()
@@ -117,7 +125,7 @@ def load_config():
         logger.error(f"Failed to load configuration: {e}")
         return None
 
-def execute_internal(line, operator_name, **context):
+def execute_internal(project_config, execution_config, line, operator_name, **context):
     logger.info(f"Executing {operator_name} operator {line}")
     logger.debug(
         f"Executing {operator_name} operator with {line} parameters and context: {context}"
@@ -158,7 +166,7 @@ def execute_internal(line, operator_name, **context):
         return -3, None, None, None, None, None, None
 
     connection_parts = connect_operator_lookup(
-        connection_name, **context
+        project_config, execution_config, connection_name, **context
     )
 
     return 0, layout_operator_lookup, dataflow, container, connection_parts, env_vars, default_values
