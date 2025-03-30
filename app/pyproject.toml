@@ -1,6 +1,6 @@
 [project]
 name = "precision-100-operators"
-version = "0.4.8"
+version = "0.4.9"
 authors = [
   { name="ennovatenow", email="ennovatenow@evolvus.com" },
 ]

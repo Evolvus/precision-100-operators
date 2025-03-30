@@ -170,3 +170,18 @@ def execute_internal(project_config, execution_config, line, operator_name, **co
     )
 
     return 0, layout_operator_lookup, dataflow, container, connection_parts, env_vars, default_values
+
+def get_default_value(property_name, operator_name, **context):
+    default_values = {}
+    config = load_config()
+    default_operator_conf = config.get(operator_name)
+    if default_operator_conf:
+        default_values = default_operator_conf.get("DEFAULT", {})
+
+    # Load custom operator configuration, if present
+    operator_conf = context.get("__OPERATOR_CONF__")
+    if operator_conf:
+        custom_default_values = operator_conf.get(operator_name, config).get("DEFAULT")
+        default_values.update(custom_default_values)
+
+    return default_values.get(property_name, None)
