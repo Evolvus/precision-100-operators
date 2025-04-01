@@ -1,125 +1,15 @@
-import subprocess, threading
-import logging, os
+import logging
 import importlib.resources as pgk_resources
 import tomllib as toml
+from . import operator_utils
 
 logger = logging.getLogger(__name__)
 
-# Execute the command
-def execute_cmd(command, env_vars=None, input=None, output=None):
-    logger.debug(f"Executing command: {command}")
-    try:
-        env = os.environ.copy()
-        if env_vars:
-            env.update(env_vars)
-
-        if input:
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                stdin=subprocess.PIPE,
-                text=True,
-                env=env,
-            )
-        else:
-            process = subprocess.Popen(
-                command,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.PIPE,
-                text=True,
-                env=env,
-            )
-
-        def output_info(stream):
-            for line in stream:
-                logger.info(line.strip())
-
-        def output_error(stream):
-            for line in stream:
-                logger.error(line.strip())
-
-        def output_to_file(stream):
-            with open(output, "w") as f:
-                for line in stream:
-                    f.write(f"{line.strip()}\n")
-
-        if output:
-            stdout_thread = threading.Thread(target=output_to_file, args=(process.stdout,))
-        else:
-            stdout_thread = threading.Thread(target=output_info, args=(process.stdout,))
-        stderr_thread = threading.Thread(target=output_error, args=(process.stderr,))
-
-        stdout_thread.start()
-        stderr_thread.start()
-
-        if input:
-            process.communicate(input=input)
-        else:
-            process.wait()
-
-        stdout_thread.join()
-        stderr_thread.join()
-
-        return process.returncode
-    except subprocess.CalledProcessError as e:
-        logger.error(f"Error executing script: {e}")
-        return -1
-
-    return 0
-
-def resolve_delimiter(in_delimiter):
-    logger.info(f"Resolving delimiter: {in_delimiter}")
-    delimiter = in_delimiter.upper()
-    if delimiter == 'TAB':
-        delimiter = '\t'
-    if delimiter == 'COMMA':
-        delimiter = ','
-    if delimiter == 'PIPE':
-        delimiter = '|'
-    if delimiter == 'CARAT':
-        delimiter = '^'
-    if delimiter == 'SPACE':
-        delimiter = ' '
-    if delimiter == 'SEMICOLON':
-        delimiter = ';'
-    if delimiter == 'COLON':
-        delimiter = ':'
-    if delimiter == 'DOLLAR':
-        delimiter = '$'
-    if delimiter == 'HASH':
-        delimiter = '#'
-    if delimiter == 'AT':
-        delimiter = '@'
-    if delimiter == 'AMPERSAND':
-        delimiter = '&'
-    if delimiter == 'ASTERISK':
-        delimiter = '*'
-    if delimiter == 'PERCENT':
-        delimiter = '%'
-    if delimiter == 'EXCLAMATION':
-        delimiter = '!'
-    if delimiter == 'QUESTION':
-        delimiter = '?'
-    if delimiter == 'TILDE':
-        delimiter = '~'
-    if delimiter == 'BACKSLASH':
-        delimiter = '\\'
-    if delimiter == 'FORWARDSLASH':
-        delimiter = '/'
-    if delimiter == 'HYPHEN':
-        delimiter = '-'
-    if delimiter == 'UNDERSCORE':
-        delimiter = '_'
-    if delimiter == 'PLUS':
-        delimiter = '+'
-
-    logger.info(f"Resolved delimiter: {delimiter}")
-    return delimiter
-
 def load_config():
     try:
-        with pgk_resources.open_binary("p100.operator.pg.resources", "config.toml") as f:
+        with pgk_resources.open_binary(
+            "p100.operator.resources", "config.toml"
+        ) as f:
             return toml.load(f)
     except Exception as e:
         logger.error(f"Failed to load configuration: {e}")
@@ -135,7 +25,7 @@ def execute_internal(project_config, execution_config, line, operator_name, **co
     if not layout_operator_lookup:
         logger.error("Layout operator not provided in context")
         return -1, None, None, None, None, None, None
-    
+
     dataflow = context.get("__DATAFLOW__")
     container = context.get("__CONTAINER__")
 
@@ -152,7 +42,7 @@ def execute_internal(project_config, execution_config, line, operator_name, **co
     if operator_conf:
         custom_env_vars = operator_conf.get(operator_name, env_vars).get("ENV")
         custom_default_values = operator_conf.get(operator_name, config).get("DEFAULT")
-        logger.debug(f"Using ENV from operator configuration: {env_vars}")   
+        logger.debug(f"Using ENV from operator configuration: {env_vars}")
         env_vars.update(custom_env_vars)
         default_values.update(custom_default_values)
 
@@ -169,19 +59,17 @@ def execute_internal(project_config, execution_config, line, operator_name, **co
         project_config, execution_config, connection_name, **context
     )
 
-    return 0, layout_operator_lookup, dataflow, container, connection_parts, env_vars, default_values
+    return (
+        0,
+        layout_operator_lookup,
+        dataflow,
+        container,
+        connection_parts,
+        env_vars,
+        default_values,
+    )
 
 def get_default_value(property_name, operator_name, **context):
-    default_values = {}
+    # load the local configuration
     config = load_config()
-    default_operator_conf = config.get(operator_name)
-    if default_operator_conf:
-        default_values = default_operator_conf.get("DEFAULT", {})
-
-    # Load custom operator configuration, if present
-    operator_conf = context.get("__OPERATOR_CONF__")
-    if operator_conf:
-        custom_default_values = operator_conf.get(operator_name, config).get("DEFAULT")
-        default_values.update(custom_default_values)
-
-    return default_values.get(property_name, None)
+    return operator_utils.get_default_value(config, operator_name, property_name, **context)

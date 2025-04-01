@@ -1,6 +1,6 @@
 import os, logging
 import subprocess, threading
-from .cmdline_operator import execute_cmd
+from .operator_utils import execute_cmd
 
 logger = logging.getLogger(__name__)
 

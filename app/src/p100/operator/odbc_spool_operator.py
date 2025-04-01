@@ -1,5 +1,6 @@
 import logging
-from .cmdline_operator import execute_cmd, execute_internal, resolve_delimiter
+from .cmdline_operator import execute_internal
+from .operator_utils import resolve_delimiter, execute_cmd
 
 logger = logging.getLogger(__name__)
 

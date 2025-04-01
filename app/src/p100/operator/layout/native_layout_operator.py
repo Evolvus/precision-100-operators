@@ -1,5 +1,6 @@
 import os, logging
 import csv
+from p100.operator.operator_utils import get_list_from_csv, get_list_from_file
 
 PARAM_PROJECT_REG_FILE_URL = "project_reg_file"
 PARAM_ENV = "env"
@@ -7,11 +8,6 @@ PARAM_ENV = "env"
 logger = logging.getLogger(__name__)
 
 class NativeLayoutOperator:
-    def is_comment(self, line):
-        return line.strip().startswith("#")
-    
-    def is_whitespace(self, line):
-        return line.isspace()
 
     def get_dataflows(self, project_config, execution_config, **context):
         logger.info(f"Getting dataflows")
@@ -30,21 +26,24 @@ class NativeLayoutOperator:
             return {}
 
         project_data = {}
-        with open(project_reg_file, "r") as f:
-            reader = csv.reader(f, is_comment=self.is_comment, is_whitespace=self.is_whitespace)
-            for row in reader:
-                if len(row) != 2:
-                    logger.error(f"Invalid row in project reference file: {row}")
-                    continue
-                description, data_flow_id = row
-                project_data[description] = data_flow_id
-                logger.debug(f"Project reference: {description} -> {data_flow_id}")
+        project_data_list = get_list_from_csv(project_reg_file)
+        if len(project_data_list) == 0:
+            logger.error(f"Project reference file is empty: {project_reg_file}")
+            return project_data
+
+        for row in project_data_list:
+            if len(row) != 2:
+                logger.error(f"Invalid row in project reference file: {row}")
+                continue
+            description, data_flow_id = row
+            project_data[description] = data_flow_id
+            logger.debug(f"Project reference: {description} -> {data_flow_id}")
 
         return project_data
 
 
     def get_containers(self, project_config, execution_config, dataflow, **context):
-        logger.info(f"Getting containers for dataflow: {dataflow}")
+        logger.debug(f"Getting containers for dataflow: {dataflow}")
         logger.debug(f"Getting containers for dataflow: {dataflow} with context: {context}")
 
         dataflow_reg = dataflow.split(",")[1]
@@ -58,25 +57,21 @@ class NativeLayoutOperator:
         dataflow_reg_file = os.path.join(dataflow_folder, f"{dataflow_reg}.reg")
 
         if not os.path.isfile(dataflow_reg_file):
-            logger.error(f"Project reference file does not exist: {dataflow_reg_file}")
+            logger.error(f"Dataflow file does not exist: {dataflow_reg_file}")
             return []
 
-        container_list = []
-        with open(dataflow_reg_file, "r") as f:
-            for line in f:
-                if(line.strip().startswith("#")):
-                    continue
-                logger.info(f"Container reference: {line.strip()}")
-                container_list.append(line.strip())
+        container_list = get_list_from_file(dataflow_reg_file)
+        logger.debug(f"Containers to execute: {len(container_list)}")
+        if len(container_list) == 0:
+            logger.error(f"Dataflow file is empty: {dataflow_reg_file}")
+            return []
 
         return container_list
 
 
     def get_instructions(self, project_config, execution_config, dataflow, container, **context):
-        logger.info(f"Getting instructions for dataflow: {dataflow} container: {container}")
+        logger.debug(f"Getting instructions for dataflow: [{dataflow}] container: [{container}]")
         logger.debug(f"Getting instructions for dataflow: {dataflow} container: {container} with context: {context}")
-
-        
 
         #Get the value of the PRECISION100_EXECUTION_CONTAINER_FOLDER
         container_folder = execution_config.get("PRECISION100_EXECUTION_CONTAINER_FOLDER")
@@ -87,28 +82,31 @@ class NativeLayoutOperator:
         container_reg_file = os.path.join(container_folder, container, "container.reg")
 
         if not os.path.isfile(container_reg_file):
-            logger.error(f"Project reference file does not exist: {container_reg_file}")
+            logger.error(f"Container file does not exist: {container_reg_file}")
             return []
 
-        instruction_list = []
-        with open(container_reg_file, "r") as f:
-            for line in f:
-                if line.isspace() or line.startswith("#"):
-                    continue
-                logger.info(f"Instruction: {line.strip()}")
-                instruction = self.get_instruction(project_config, execution_config, dataflow, container, line.strip(), **context)
-                logger.info(f"Instruction: {instruction}")
-                instruction_list.append(instruction)
+        result= []
+        instruction_list = get_list_from_file(container_reg_file)
+        logger.debug(f"Instructions to execute: {len(instruction_list)}")
+        if len(instruction_list) == 0:
+            logger.error(f"Container file is empty: {container_reg_file}")
+            return []
 
-        return instruction_list
+        for line in instruction_list:
+            instruction = self.get_instruction(project_config, execution_config, dataflow, container, line, **context)
+            logger.info(f"Instruction: {instruction}")
+            result.append(instruction)
+
+        logger.debug(f"Instructions to execute: {len(instruction_list)}")
+        return result
 
     def get_instruction(self, project_config, execution_config, dataflow, container, instruction, delimiter=",", **context):
-        logger.info(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction}")
-        logger.debug(f"Getting instruction for dataflow: {dataflow} container: {container} instruction: {instruction} with context: {context}")
+        logger.debug(f"Getting instruction for dataflow: [{dataflow}] container: [{container}] instruction: [{instruction}]")
+        logger.debug(f"Getting instruction for dataflow: [{dataflow}] container: [{container}] instruction: [{instruction}] with context: {context}")
 
-        instruction_parts = instruction.strip().split(delimiter)
+        instruction_parts = instruction.split(delimiter)
         if len(instruction_parts) < 3:
-           logger.error(f"Invalid instruction line: {instruction.strip()}")
+           logger.error(f"Invalid instruction line: {instruction}")
            return {}
 
         instruction_context = {
@@ -120,6 +118,7 @@ class NativeLayoutOperator:
         for i, param in enumerate(instruction_parts[3:], start=1):
            instruction_context[f"__PARAM{i}__"] = param
             
+        logger.debug(f"Instruction context: {instruction_context}")
         return instruction_context
 
 

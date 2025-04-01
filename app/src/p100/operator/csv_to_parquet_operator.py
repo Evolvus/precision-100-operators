@@ -1,5 +1,6 @@
 import logging
-from .cmdline_operator import execute_cmd, get_default_value, resolve_delimiter
+from .cmdline_operator import get_default_value
+from .operator_utils import resolve_delimiter, execute_cmd
 
 logger = logging.getLogger(__name__)
 
@@ -53,13 +54,22 @@ def execute(project_config, execution_config, line, **context):
     else:   
         ignore_errors = True
 
-    if line.get("__PARAM7__"):
-        columns = line.get("__PARAM7__")
+    if line.get("__PARAM7__") and line.get("__PARAM7__").upper() == "NO":
+        store_rejects = False
+    else:
+        store_rejects = True
+
+    if line.get("__PARAM8__"):
+        columns = line.get("__PARAM8__")
     
     if columns:
-        script_name = f"copy (select * from read_csv('{csv_file_name}', delim = '{delimiter}', quote = '{quote}', header = {header}, escape = '{escape}', ignore_errors = {ignore_errors}, columns = ({columns}) )) to '{parquet_file_name}' (format parquet)"
+        script_name = f"copy (select * from read_csv('{csv_file_name}', delim = '{delimiter}', quote = '{quote}', header = {header}, escape = '{escape}', store_rejects = {store_rejects}, columns = ({columns}) )) to '{parquet_file_name}' (format parquet);"
     else:
-        script_name = f"copy (select * from read_csv('{csv_file_name}', delim = '{delimiter}', quote = '{quote}', header = {header}, escape = '{escape}', ignore_errors = {ignore_errors})) to '{parquet_file_name}' (format parquet)"
+        script_name = f"copy (select * from read_csv('{csv_file_name}', delim = '{delimiter}', quote = '{quote}', header = {header}, escape = '{escape}', store_rejects = {store_rejects})) to '{parquet_file_name}' (format parquet);"
+    
+    if store_rejects:
+        script_name += f"copy reject_scans to '{parquet_file_name}.reject_scans' (HEADER, DELIMITER ',');"
+        script_name += f"copy reject_errors to '{parquet_file_name}.reject_errors' (HEADER, DELIMITER ',');" 
 
     # Construct the command
     command = [
