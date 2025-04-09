@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 class NativeLayoutOperator:
 
     def get_dataflows(self, project_config, execution_config, **context):
-        logger.info(f"Getting dataflows")
+        logger.debug(f"Getting dataflows")
         logger.debug(f"Getting dataflows with context: {context}")
 
         #Get the value of the PRECISION100_PROJECT_CONF_FOLDER from my_env
@@ -94,7 +94,7 @@ class NativeLayoutOperator:
 
         for line in instruction_list:
             instruction = self.get_instruction(project_config, execution_config, dataflow, container, line, **context)
-            logger.info(f"Instruction: {instruction}")
+            logger.debug(f"Instruction: {instruction}")
             result.append(instruction)
 
         logger.debug(f"Instructions to execute: {len(instruction_list)}")
@@ -123,7 +123,7 @@ class NativeLayoutOperator:
 
 
     def lookup(self, project_config, execution_config, dataflow, container, file, **context):
-        logger.info(f"Lookup {file} for dataflow: {dataflow} container: {container}")
+        logger.debug(f"Lookup {file} for dataflow: {dataflow} container: {container}")
         logger.debug(f"Lookup {file} for dataflow: {dataflow} container: {container} with context: {context}")
         my_env = context[PARAM_ENV]
 
