@@ -1,5 +1,6 @@
 import csv, logging, os, subprocess, time
 from csv import QUOTE_MINIMAL, reader as csv_reader
+from p100.core import base64_encode, base64_decode
 
 logger = logging.getLogger(__name__)
 
@@ -249,7 +250,7 @@ def execute_cmd(
         int: The return code of the command execution.
     """
     now = int(time.time())
-    logger.debug(f"Executing command: {command} at: {now}")
+    logger.debug(f"Executing command: {command} with: {input} and output: {output}")
     try:
         env = os.environ.copy()
         if env_vars:
@@ -274,13 +275,36 @@ def execute_cmd(
                 stdout = subprocess.PIPE,
                 stderr = subprocess.PIPE,
             )
-
-        end = int(time.time())
-        execution_time = end - now
-        logger.debug(f"Command: {process.args} return code: {process.returncode} in: {execution_time} seconds")
+        logger.debug(f"Command: {process.args} return code: {process.returncode}")
         return process.returncode
     except subprocess.CalledProcessError as e:
         logger.error(f"Error executing script: {e}")
         return -1
-
+    except Exception as e:
+        logger.error(f"Unexpected error executing command: {e}")
+        return -1
+    finally:
+        end = int(time.time())
+        execution_time = end - now
+        logger.debug(f"Command execution completed in: {execution_time} seconds")
     return 0
+
+def base64_encode(data: str) -> str:
+    """
+    Encode a string to Base64 format.
+    Args:
+        data (str): The string to encode.
+    Returns:
+        str: The Base64 encoded string.
+    """
+    return base64_encode(data)
+
+def base64_decode(data: str) -> str:
+    """
+    Decode a Base64 encoded string.
+    Args:
+        data (str): The Base64 encoded string to decode.
+    Returns:
+        str: The decoded string.
+    """
+    return base64_decode(data)
