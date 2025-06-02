@@ -31,7 +31,15 @@ def execute(project_config, execution_config, line, **context):
     script_params = []
     i = 1
     while f"__PARAM{i}__" in line:
-        script_params.append(line[f"__PARAM{i}__"])
+        # if the parameter contains the expression :// resolve it
+        if "://" in line[f"__PARAM{i}__"]:
+            script_params.append(
+                layout_operator_lookup(
+                    project_config, execution_config, dataflow, container, line[f"__PARAM{i}__"], **context
+                )
+            )
+        else:
+            script_params.append(line[f"__PARAM{i}__"])
         i += 1
 
     # Construct the command
