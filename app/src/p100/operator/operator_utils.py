@@ -1,13 +1,11 @@
-import csv, logging, os, subprocess, time
+import csv, logging, os, subprocess, time, threading
 from csv import QUOTE_MINIMAL, reader as csv_reader
 from p100.core import base64_encode, base64_decode
 
 logger = logging.getLogger(__name__)
 
-def get_list_from_file(
-    file_path: str,
-    comment: str = "#"
-) -> list:
+
+def get_list_from_file(file_path: str, comment: str = "#") -> list:
     """
     Read a file and return a list of lines excluding empty and commented lines.
 
@@ -39,6 +37,7 @@ def get_list_from_file(
         list_of_values.append(line.strip())
     logger.debug(f"Read Valid Lines {len(list_of_values)} lines from file: {file_path}")
     return list_of_values
+
 
 def get_list_from_csv(
     file_path: str,
@@ -181,10 +180,9 @@ def resolve_delimiter(in_delimiter: str) -> str:
     logger.debug(f"Resolved delimiter: {delimiter}")
     return delimiter
 
+
 def get_default_env_config(
-    config: dict,
-    operator_name: str,
-    **context
+    config: dict, operator_name: str, **context
 ) -> tuple[dict, dict]:
     """
     Get the default enviroment and values for a operator configuration.
@@ -213,15 +211,13 @@ def get_default_env_config(
 
     return env_vars, default_values
 
+
 def get_default_value(
-    config: dict, 
-    operator_name: str, 
-    property_name: str, 
-    **context
+    config: dict, operator_name: str, property_name: str, **context
 ) -> str | None:
     """
     Get the default value for a given property from the operator configuration. "
-    
+
     Args:
         config (dict): The configuration dictionary.
         operator_name (str): The name of the operator.
@@ -233,11 +229,9 @@ def get_default_value(
     env_vars, default_values = get_default_env_config(config, operator_name, **context)
     return default_values.get(property_name, None)
 
+
 def execute_cmd(
-        command: str | list, 
-        env_vars: dict = None, 
-        input: str = None, 
-        output: str = None
+    command: str | list, env_vars: dict = None, input: str = None, output: str = None
 ) -> int:
     """
     Execute a command in a subprocess with optional environment variables and input/output redirection.
@@ -251,31 +245,47 @@ def execute_cmd(
     """
     now = int(time.time())
     logger.debug(f"Executing command: {command} with: {input} and output: {output}")
+    execution_time = 0
+
+    def print_dots():
+        """
+        Print a dot every second to indicate that the command is still running.
+        """
+        while not process_completed.is_set():
+            print(".", end="", flush=True)
+            time.sleep(1)
+
+    process_completed = threading.Event()
     try:
         env = os.environ.copy()
         if env_vars:
             env.update(env_vars)
 
-        if output:
-            with open(output, "w") as out_file:
-                process = subprocess.run(
-                    command, 
-                    text = True, 
-                    env = env, 
-                    input = input if input else None, 
-                    stdout = out_file,
-                    stderr = subprocess.PIPE,
-                )
-        else:
-            process = subprocess.run(
-                command, 
-                text = True, 
-                env = env, 
-                input = input if input else None, 
-                stdout = subprocess.PIPE,
-                stderr = subprocess.PIPE,
-            )
-        logger.debug(f"Command: {process.args} return code: {process.returncode}")
+        process = subprocess.Popen(
+            command,
+            text=True,
+            env=env,
+            stdin=subprocess.PIPE,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        )
+
+        dots_thread = threading.Thread(target=print_dots)
+        dots_thread.start()
+
+        stdout, stderr = process.communicate(input=input if input else None)
+        if process.returncode == 0 and output:
+            with open(output, "w") as f:
+                f.write(stdout)
+        process_completed.set()
+        dots_thread.join()
+
+        end = int(time.time())
+        execution_time = end - now
+        logger.debug(f"error output: {stderr.strip()}")
+        logger.debug(
+            f"Command: {process.args} return code: {process.returncode} in: {execution_time} seconds"
+        )
         return process.returncode
     except subprocess.CalledProcessError as e:
         logger.error(f"Error executing script: {e}")
@@ -289,6 +299,7 @@ def execute_cmd(
         logger.debug(f"Command execution completed in: {execution_time} seconds")
     return 0
 
+
 def base64_encode(data: str) -> str:
     """
     Encode a string to Base64 format.
@@ -298,6 +309,7 @@ def base64_encode(data: str) -> str:
         str: The Base64 encoded string.
     """
     return base64_encode(data)
+
 
 def base64_decode(data: str) -> str:
     """
