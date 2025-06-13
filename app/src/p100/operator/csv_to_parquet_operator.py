@@ -71,6 +71,7 @@ def execute(project_config, execution_config, line, **context):
         script_name += f"copy reject_scans to '{parquet_file_name}.reject_scans' (HEADER, DELIMITER ',');"
         script_name += f"copy reject_errors to '{parquet_file_name}.reject_errors' (HEADER, DELIMITER ',');" 
 
+    print(f"Compress {line.get("__PARAM0__")}")
     # Construct the command
     command = [
         "duckdb",

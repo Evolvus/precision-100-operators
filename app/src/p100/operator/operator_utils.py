@@ -297,6 +297,7 @@ def execute_cmd(
         end = int(time.time())
         execution_time = end - now
         logger.debug(f"Command execution completed in: {execution_time} seconds")
+        print(f"{execution_time}s")
     return 0
 
 

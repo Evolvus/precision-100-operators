@@ -42,6 +42,7 @@ def execute(project_config, execution_config, line, **context):
             script_params.append(line[f"__PARAM{i}__"])
         i += 1
 
+    print(f"Executing script: {line.get('__PARAM0__')}")
     # Construct the command
     command = [script_name] + script_params
     return execute_cmd(command)
