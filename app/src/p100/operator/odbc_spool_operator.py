@@ -65,4 +65,5 @@ def execute(project_config, execution_config, line, **context):
     if quote == "YES":
         command.append("-q")
 
+    print(f"Spool data to {line.get('__PARAM2__')}.")
     return execute_cmd(command=command, input=sql, output=spool_file)
